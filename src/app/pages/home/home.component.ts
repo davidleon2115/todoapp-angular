@@ -1,6 +1,6 @@
 import { Task } from './../../models/taks.model';
 import { CommonModule } from '@angular/common';
-import { Component, signal } from '@angular/core';
+import { Component, Injector, computed, effect, inject, signal } from '@angular/core';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 
 
@@ -27,6 +27,20 @@ export class HomeComponent {
 
   filter = signal('all');
 
+  taskByFilter = computed(() => {
+    const filter = this.filter();
+    const tasks = this.tasks();
+
+    if (filter === 'pending') {
+      return tasks.filter( task => !task.completed )
+    }
+    if (filter === 'completed') {
+      return tasks.filter( task => task.completed )
+    }
+    return tasks;
+
+  })
+
   newTaskCtrl = new FormControl('', {
       nonNullable : true,
       validators: [
@@ -34,6 +48,24 @@ export class HomeComponent {
       ]
     }
   );
+
+  injector = inject(Injector);
+
+  constructor() {
+    effect( () => {
+      const tasks = this.tasks();
+      localStorage.setItem('tasks', JSON.stringify(tasks))
+    } )
+  }
+
+  ngOnInit(): void {
+    const storage = localStorage.getItem('tasks');
+    if (storage){
+      const tasks = JSON.parse(storage);
+      this.tasks.set(tasks);
+    }
+    
+  }
 
   changeHandler() : void {
     // const input : HTMLInputElement = event.target as HTMLInputElement;
