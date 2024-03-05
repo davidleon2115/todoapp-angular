@@ -12,18 +12,7 @@ import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
   styleUrl: './home.component.css'
 })
 export class HomeComponent {
-  tasks = signal<Task[]>([
-    {
-      id : Date.now(),
-      title: 'Crear Proyecto',
-      completed: false
-    },
-    {
-      id : Date.now(),
-      title: 'Crear Componentes',
-      completed: false
-    }
-  ])
+  tasks = signal<Task[]>([])
 
   filter = signal('all');
 
