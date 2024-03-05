@@ -51,12 +51,12 @@ export class HomeComponent {
 
   injector = inject(Injector);
 
-  constructor() {
-    effect( () => {
-      const tasks = this.tasks();
-      localStorage.setItem('tasks', JSON.stringify(tasks))
-    } )
-  }
+  // constructor() {
+  //   effect( () => {
+  //     const tasks = this.tasks();
+  //     localStorage.setItem('tasks', JSON.stringify(tasks))
+  //   } )
+  // }
 
   ngOnInit(): void {
     const storage = localStorage.getItem('tasks');
@@ -64,7 +64,14 @@ export class HomeComponent {
       const tasks = JSON.parse(storage);
       this.tasks.set(tasks);
     }
-    
+    this.trackTasks();
+  }
+
+  trackTasks(){
+    effect( () => {
+      const tasks = this.tasks();
+      localStorage.setItem('tasks', JSON.stringify(tasks))
+    }, { injector : this.injector })
   }
 
   changeHandler() : void {
