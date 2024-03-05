@@ -1,12 +1,13 @@
 import { Task } from './../../models/taks.model';
 import { CommonModule } from '@angular/common';
 import { Component, signal } from '@angular/core';
+import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'
 })
@@ -24,11 +25,27 @@ export class HomeComponent {
     }
   ])
 
-  changeHandler(event : Event) : void {
-    const input : HTMLInputElement = event.target as HTMLInputElement;
-    const newTask : string = input.value;
-    this.addTask(newTask);
-    input.value = "";
+  filter = signal('all');
+
+  newTaskCtrl = new FormControl('', {
+      nonNullable : true,
+      validators: [
+        Validators.required
+      ]
+    }
+  );
+
+  changeHandler() : void {
+    // const input : HTMLInputElement = event.target as HTMLInputElement;
+    // const newTask : string = input.value;
+    if (this.newTaskCtrl.valid) {
+      const value = this.newTaskCtrl.value.trim() as string;
+      if (value !== '') {
+        this.addTask(value);
+        this.newTaskCtrl.setValue('');
+      }
+    }
+    // input.value = "";
   }
 
   addTask(title : string) : void {
@@ -57,5 +74,39 @@ export class HomeComponent {
       })
     })
 
+  }
+
+  editTaskClass(index : number) {
+    this.tasks.update((prevTask) => {
+      return prevTask.map((task, position) => { 
+        if(index === position) { 
+          return { 
+            ...task, 
+            editing : true
+          }
+        }
+        return task;
+      })
+    })
+  }
+
+  editTaskText(index : number, event : Event) {
+    const input : HTMLInputElement = event.target as HTMLInputElement
+    this.tasks.update((prevTask) => {
+      return prevTask.map((task, position) => { 
+        if(index === position) { 
+          return { 
+            ...task, 
+            title : input.value,
+            editing : false
+          }
+        }
+        return task;
+      })
+    })
+  }
+
+  changeFilter(filter : string) {
+    this.filter.set(filter)
   }
 }

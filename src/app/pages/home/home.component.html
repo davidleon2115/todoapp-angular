@@ -8,20 +8,21 @@
         placeholder="Type new todo"
         autofocus
         type="text"
-        (change)="changeHandler($event)"
+        [formControl]="newTaskCtrl"
+        (keydown.enter)="changeHandler()"
       />
     </div>
   </header>
   <div class="container todoapp-wrapper">
     <!-- This section should be hidden by default and shown when there are todos -->
-    <pre>
-        <code>
-            {{ tasks() | json }}
-        </code>
-    </pre>
     <section class="main">
       <ul class="todo-list">
-        <li *ngFor="let task of tasks(); index as i">
+        <li
+          *ngFor="let task of tasks(); index as i"
+          [class.completed]="task.completed"
+          [class.editing]="task.editing"
+          (dblclick)="editTaskClass(i)"
+        >
           <div class="view">
             <input
               class="toggle"
@@ -32,34 +33,12 @@
             <label>{{ task.title }}</label>
             <button (click)="deteleTask(i)" class="destroy"></button>
           </div>
-          <input class="edit" value="Buy a unicorn" />
+          <input
+            class="edit"
+            (keydown.enter)="editTaskText(i, $event)"
+            [value]="task.title"
+          />
         </li>
-        <!--
-        <li class="completed">
-          <div class="view">
-            <input class="toggle" type="checkbox" checked />
-            <label>Learn JavaScript</label>
-            <button class="destroy"></button>
-          </div>
-          <input class="edit" value="Learn JavaScript" />
-        </li>
-        <li>
-          <div class="view">
-            <input class="toggle" type="checkbox" />
-            <label>Buy a unicorn</label>
-            <button class="destroy"></button>
-          </div>
-          <input class="edit" value="Buy a unicorn" />
-        </li>
-        <li class="editing">
-          <div class="view">
-            <input class="toggle" type="checkbox" />
-            <label>Make dishes</label>
-            <button class="destroy"></button>
-          </div>
-          <input class="edit" value="Make dishes" />
-        </li>
-        -->
       </ul>
     </section>
     <!-- This footer should be hidden by default and shown when there are todos -->
@@ -74,13 +53,13 @@
       </span>
       <!-- Remove this if you don't implement routing -->
       <ul class="filters">
-        <li>
+        <li (click)="changeFilter('all')">
           <a routerLink="/" class="selected">All</a>
         </li>
-        <li>
+        <li (click)="changeFilter('pending')">
           <a routerLink="/pending">Pending</a>
         </li>
-        <li>
+        <li (click)="changeFilter('completed')">
           <a routerLink="/completed">Completed</a>
         </li>
       </ul>
