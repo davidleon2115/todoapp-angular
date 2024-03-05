@@ -89,6 +89,10 @@ export class HomeComponent {
     this.tasks.update((tasks) => tasks.filter((task, position ) => index !== position));
   }
 
+  clearTasks(){
+    this.tasks.update((tasks) => [])
+  }
+
   updateTask(index : number) {
     this.tasks.update((task) => {
       return task.map((task, position) => { 
